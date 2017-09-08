@@ -1,15 +1,25 @@
 package com.example.admin.myapplication1;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,6 +30,13 @@ import java.util.List;
 import java.util.Random;
 
 public class PlayGame extends AppCompatActivity implements OnClickListener {
+    CallbackManager callbackManager;
+    ShareDialog shareDialog;
+    private Bitmap image;
+    private int counter = 0;
+    ShareButton shareButton = null;
+
+
     private int level = 0, answer = 0, operator = 0, operand1 = 0, operand2 = 0;
     private final int ADD_OPERATOR = 0, SUBTRACT_OPERATOR = 1, MULTIPLY_OPERATOR = 2, DIVIDE_OPERATOR = 3;
 
@@ -44,6 +61,15 @@ public class PlayGame extends AppCompatActivity implements OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        shareButton = (ShareButton)findViewById(R.id.fb_share_button);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                postPicture();
+            }
+
+        });
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playgame);
@@ -93,6 +119,45 @@ public class PlayGame extends AppCompatActivity implements OnClickListener {
         }
         random = new Random();
         chooseQuestion();
+    }
+    public void postPicture() {
+        //callbackManager = CallbackManager.Factory.create();
+       // shareDialog = new ShareDialog(this);
+        //check counter
+        if(counter == 0) {
+            //save the screenshot
+            View rootView = findViewById(android.R.id.content).getRootView();
+            rootView.setDrawingCacheEnabled(true);
+            // creates immutable clone of image
+            image = Bitmap.createBitmap(rootView.getDrawingCache());
+            // destroy
+            rootView.destroyDrawingCache();
+
+            //share dialog
+            AlertDialog.Builder shareDialog = new AlertDialog.Builder(this);
+            shareDialog.setTitle("Share Screen Shot");
+            shareDialog.setMessage("Share image to Facebook?");
+            shareDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    //share the image to Facebook
+                    SharePhoto photo = new SharePhoto.Builder().setBitmap(image).build();
+                    SharePhotoContent content = new SharePhotoContent.Builder().addPhoto(photo).build();
+                    shareButton.setShareContent(content);
+                    counter = 1;
+                    shareButton.performClick();
+                }
+            });
+            shareDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            shareDialog.show();
+        }
+        else {
+            counter = 0;
+            shareButton.setShareContent(null);
+        }
     }
     private void chooseQuestion(){
 //get a question

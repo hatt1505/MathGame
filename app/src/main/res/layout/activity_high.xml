@@ -51,6 +51,7 @@
             android:textColor="#ffffffff"
             android:textSize="22sp"
             android:textStyle="bold" />
+
     </RelativeLayout>
 
 </ScrollView>

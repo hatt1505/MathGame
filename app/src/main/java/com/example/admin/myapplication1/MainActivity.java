@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.share.widget.ShareButton;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
@@ -19,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         playBtn = (Button) findViewById(R.id.play_btn);
         helpBtn = (Button) findViewById(R.id.help_btn);
